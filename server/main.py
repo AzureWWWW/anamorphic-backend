@@ -6,7 +6,7 @@ from api_router import api_router
 from models import Base
 from database import engine
 
-app = FastAPI(title="E2E Chat Server")
+app = FastAPI(title="Anamorphic Server")
 
 # Include routers
 app.include_router(api_router)

@@ -16,7 +16,7 @@ async def get_db():
 async def get_current_user(token: str = Depends(oauth2_scheme), db: AsyncSession = Depends(get_db)) -> User:
     try:
         payload = jwt.decode(token, settings.JWT_SECRET_KEY, algorithms=[settings.JWT_ALG])
-        uid = int(payload.get("sub"))
+        uid = int(payload.get("user_id"))
     except (JWTError, ValueError, TypeError):
         raise HTTPException(401, "invalid_token")
     user = await db.scalar(select(User).where(User.id == uid))

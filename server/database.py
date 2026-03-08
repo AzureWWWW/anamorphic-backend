@@ -1,5 +1,10 @@
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
 from pydantic_settings import BaseSettings
+import os
+
+# Get the absolute path of the .env file
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) # return backend folder
+ENV_FILE = os.path.join(BASE_DIR, ".env")
 
 
 class Settings(BaseSettings):
@@ -7,6 +12,10 @@ class Settings(BaseSettings):
     DATABASE_URL: str = "sqlite+aiosqlite:///./chat.db"
     JWT_SECRET_KEY: str = "Thanhbjim@$@&^@&%^&RFghgjSachin"
     JWT_ALG: str = "HS256"
+
+    class Config:
+        env_file = ENV_FILE
+        env_file_encoding = "utf-8"
 
 
 settings = Settings()

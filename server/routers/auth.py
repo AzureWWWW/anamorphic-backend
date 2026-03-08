@@ -5,18 +5,15 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from jose import jwt
 from datetime import datetime, timedelta, timezone
 
-from database import SessionLocal, settings
-from models import User, PublicKey
+from database import settings
+from models import User
 from encryption_db import hash_password, verify_password
+from deps import get_db, get_current_user
 
 router = APIRouter()
 
-async def get_db():
-    async with SessionLocal() as session:
-        yield session
-
-def create_token(sub: str):
-    payload = {"sub": sub, "exp": datetime.now(timezone.utc) + timedelta(days=7)}
+def create_token(user_id: str):
+    payload = {"user_id": user_id, "exp": datetime.now(timezone.utc) + timedelta(days=7)}
     return jwt.encode(payload, settings.JWT_SECRET_KEY, algorithm=settings.JWT_ALG)
 
 @router.post("/signup")
@@ -44,5 +41,8 @@ async def login(form: OAuth2PasswordRequestForm = Depends(), db: AsyncSession = 
     return {"access_token": token, "token_type": "bearer"}
 
 @router.post("/logout")
-async def logout():
-    pass
+async def logout(db: AsyncSession = Depends(get_db), me: User = Depends(get_current_user)):
+    me.active_status = False
+    await db.commit()
+    await db.refresh(me)
+    return {"message": "Logout succesfully"}

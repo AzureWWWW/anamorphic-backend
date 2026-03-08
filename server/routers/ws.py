@@ -8,7 +8,7 @@ import json, time
 router = APIRouter()
 active_ws = {}
 
-SECRET = "MY_SECRET"
+SECRET = "Thanhbjim@$@&^@&%^&RFghgjSachin"
 
 @router.websocket("/ws")
 async def ws_endpoint(ws: WebSocket):
@@ -48,7 +48,7 @@ async def ws_endpoint(ws: WebSocket):
 
             # ------- GET PUBKEY -------
             if mtype == "get_pubkey":
-                target_username = msg["username"]
+                target_username = msg["target_username"]
                 async with SessionLocal() as db:
                     target = await db.scalar(
                         select(User).where(User.username == target_username)
@@ -64,7 +64,7 @@ async def ws_endpoint(ws: WebSocket):
 
                 await ws.send_text(json.dumps({
                     "type": "pubkey",
-                    "username": target_username,
+                    "target_username": target_username,
                     "pubkey": target_pubkey.pubkey
                 }))
 

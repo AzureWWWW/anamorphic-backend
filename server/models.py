@@ -30,7 +30,7 @@ class PublicKey(Base):
 class Message(Base):
     __tablename__ = "messages"
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    msg_id: Mapped[str | None] = mapped_column(String(64), unique=True, nullable=True)
+    # msg_id: Mapped[str | None] = mapped_column(String(64), unique=True, nullable=True)
     sender_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True)
     receiver_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True)
     body: Mapped[dict] = mapped_column(JSON)      # ciphertext envelope
