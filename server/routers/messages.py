@@ -68,7 +68,7 @@ async def history(p: HistoryIn, db: AsyncSession = Depends(get_db), me: User = D
             ),
             Message.timestamp < cutoff
         )
-        .order_by(Message.timestamp.desc())
+        .order_by(Message.timestamp.asc())
         .limit(p.limit)
     )
     rows = (await db.scalars(q)).all()
