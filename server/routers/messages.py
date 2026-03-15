@@ -57,7 +57,7 @@ async def history(p: HistoryIn, db: AsyncSession = Depends(get_db), me: User = D
     peer = await db.scalar(select(User).where(User.username == p.with_user))
     if not peer:
         return {"items": []}
-    cutoff = p.before_ts or int(time.time())
+    cutoff = p.before_ts or int(time.time()) + 1  # +1 so messages sent right now are included
     q = (
         select(Message)
         .where(
@@ -68,6 +68,7 @@ async def history(p: HistoryIn, db: AsyncSession = Depends(get_db), me: User = D
             ),
             Message.timestamp < cutoff
         )
+        # FIX: was .desc() — newest messages were first, rendering upside-down
         .order_by(Message.timestamp.asc())
         .limit(p.limit)
     )
