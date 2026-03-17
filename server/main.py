@@ -6,8 +6,22 @@ from api_router import api_router
 
 from models import Base
 from database import engine
+from contextlib import asynccontextmanager
 
-app = FastAPI(title="Anamorphic Server")
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # --- startup ---
+    async with engine.begin() as conn:
+        await conn.execute(text("PRAGMA journal_mode=WAL"))
+        await conn.execute(text("PRAGMA foreign_keys=ON"))
+        await conn.run_sync(Base.metadata.create_all)
+    
+    yield  # app runs here
+    
+    # --- shutdown (optional) ---
+    await engine.dispose()
+
+app = FastAPI(title="Anamorphic Server", lifespan=lifespan)
 
 # Enable CORS
 app.add_middleware(
@@ -21,10 +35,10 @@ app.add_middleware(
 # Include routers
 app.include_router(api_router)
 
-# Create tables and set SQLite pragmas on startup
-@app.on_event("startup")
-async def on_startup():
-    async with engine.begin() as conn:
-        await conn.execute(text("PRAGMA journal_mode=WAL"))
-        await conn.execute(text("PRAGMA foreign_keys=ON"))
-        await conn.run_sync(Base.metadata.create_all)
+if __name__ == "__main__":
+    uvicorn.run(
+        "main:app",
+        host="0.0.0.0",
+        port=8000,
+        reload=True
+    )
