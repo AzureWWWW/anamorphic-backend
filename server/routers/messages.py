@@ -68,7 +68,7 @@ async def history(p: HistoryIn, db: AsyncSession = Depends(get_db), me: User = D
             ),
             Message.timestamp < cutoff
         )
-        # FIX: was .desc() — newest messages were first, rendering upside-down
+        # rendering upside-down
         .order_by(Message.timestamp.asc())
         .limit(p.limit)
     )

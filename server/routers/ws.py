@@ -10,8 +10,6 @@ active_ws = {}
 
 SECRET = "Thanhbjim@$@&^@&%^&RFghgjSachin"
 
-# FIX 1: was "/ws" — with prefix="/ws" in api_router.py this made the full
-# path /ws/ws. Changed to "" so the full path is /ws.
 @router.websocket("")
 async def ws_endpoint(ws: WebSocket):
     await ws.accept()
@@ -24,8 +22,6 @@ async def ws_endpoint(ws: WebSocket):
 
     try:
         payload = jwt.decode(token, SECRET, algorithms=["HS256"])
-        # FIX 2: JWT stores user_id as a string; cast to int so that
-        # active_ws keys are always ints and match target.id (which is int).
         me_id = int(payload["user_id"])
     except (JWTError, ValueError, TypeError):
         await ws.close(code=4401)
@@ -84,8 +80,6 @@ async def ws_endpoint(ws: WebSocket):
                         await ws.send_text(json.dumps({"type": "user_not_found"}))
                         continue
 
-                    # Always persist — previously only saved when offline,
-                    # meaning messages sent to online users were lost on reload.
                     await db.execute(
                         insert(Message).values(
                             sender_id=me_id,

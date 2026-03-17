@@ -25,7 +25,6 @@ app.include_router(api_router)
 @app.on_event("startup")
 async def on_startup():
     async with engine.begin() as conn:
-        # Better concurrency for many readers/writers
         await conn.execute(text("PRAGMA journal_mode=WAL"))
         await conn.execute(text("PRAGMA foreign_keys=ON"))
         await conn.run_sync(Base.metadata.create_all)

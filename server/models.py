@@ -11,7 +11,6 @@ class User(Base):
     username: Mapped[str] = mapped_column(String(50), unique=True, index=True)
     password_hash: Mapped[str] = mapped_column(String(200))
     active_status: Mapped[bool] = mapped_column(Boolean, default=False, index=True)
-    # Pro-tip: Use a lambda or func.now() so the time is evaluated at insertion, not at app startup
     created_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc))
     
     public_keys = relationship(

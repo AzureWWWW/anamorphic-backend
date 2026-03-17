@@ -37,8 +37,6 @@ async def get_user_pubkey(username: str, db: AsyncSession = Depends(get_db)):
     if not target:
         raise HTTPException(404, "user_not_found")
 
-    # FIX: was PublicKey.id == target.id (wrong — id is the PK of PublicKey)
-    #      should be PublicKey.user_id == target.id
     target_pubkey = await db.scalar(
         select(PublicKey).where(PublicKey.user_id == target.id)
     )
